@@ -13,9 +13,11 @@ jobs:
     container: cuaesd/aesd-autotest:24-unit-test
     steps:
       - uses: actions/checkout@v2
+
       - name: Checkout submodules
         run: git submodule update --init --recursive
-      - name: Run unit test
+
+      - name: Run unit-test.sh
         run: ./unit-test.sh
 
   full-test:
@@ -23,7 +25,15 @@ jobs:
     container: cuaesd/aesd-autotest:24-assignment1
     steps:
       - uses: actions/checkout@v2
+
       - name: Checkout submodules
         run: git submodule update --init --recursive
-      - name: Run full test
+
+      - name: Run finder.sh
+        run: ./finder-app/finder.sh /tmp/sampledir assignment1
+
+      - name: Run writer.sh
+        run: ./finder-app/writer.sh /tmp/testfile.txt "This is a test content."
+
+      - name: Run full-test.sh
         run: ./full-test.sh
