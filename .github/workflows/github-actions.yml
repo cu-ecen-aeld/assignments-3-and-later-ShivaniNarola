@@ -29,6 +29,12 @@ jobs:
       - name: Checkout submodules
         run: git submodule update --init --recursive
 
+      - name: Prepare test input for finder.sh
+        run: |
+          mkdir -p /tmp/sampledir
+          echo "assignment1 content 1" > /tmp/sampledir/file1.txt
+          echo "assignment1 content 2" > /tmp/sampledir/file2.txt
+
       - name: Run finder.sh
         run: ./finder-app/finder.sh /tmp/sampledir assignment1
 
