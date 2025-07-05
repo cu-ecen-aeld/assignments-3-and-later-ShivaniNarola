@@ -46,7 +46,7 @@ chmod +x ./finder.sh
 
 # Run writer.sh for NUMFILES times
 for i in $(seq 1 $NUMFILES); do
-    ./writer.sh "$WRITEDIR/${username}$i.txt" "$WRITESTR"
+    ./writer "$WRITEDIR/${username}$i.txt" "$WRITESTR"
 done
 
 # Run finder.sh to search written strings
