@@ -35,12 +35,16 @@ for i in $(seq 1 ${WRITE_NUM}); do
 done
 
 # Find string occurrences
-MATCHCOUNT=$(./finder.sh "${WRITEDIR}" "${WRITE_STR}" | grep "Number of files" | awk '{print $6}')
+MATCHCOUNT=$(./finder.sh "${WRITEDIR}" "${WRITE_STR}" | grep "Number of files" | awk '{print $6}' || echo 0)
 
-if [ "$MATCHCOUNT" -eq "$WRITE_NUM" ]; then
+echo "WRITE_NUM = $WRITE_NUM"
+echo "MATCHCOUNT = $MATCHCOUNT"
+
+if [[ "$MATCHCOUNT" =~ ^[0-9]+$ ]] && [ "$MATCHCOUNT" -eq "$WRITE_NUM" ]; then
     echo "Success: Found $MATCHCOUNT matches"
     exit 0
 else
     echo "Failure: Expected $WRITE_NUM matches but found $MATCHCOUNT"
     exit 1
 fi
+
