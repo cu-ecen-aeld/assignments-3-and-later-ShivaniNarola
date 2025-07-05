@@ -1,50 +1,37 @@
 #!/bin/bash
+# Script: finder-test.sh
+# Runs a test to check if the writer app and finder app are working correctly
 
-set -e
-set -u
-
-# Default parameters
-WRITE_STR="AELD_IS_FUN"
 WRITE_NUM=10
-WRITELEN=0
-WRITEDIR="/tmp/aeld-data"
+WRITE_STRING="AELD_IS_FUN"
+WRITRFILE="/tmp/aeld-data"
+WRITRFILE_NAME="${WRITRFILE}/writer_$(date +%s)"
 
-# Accept command line overrides
-if [ $# -ge 1 ]; then
-    WRITE_STR=$1
-fi
+# Create the directory
+mkdir -p "$WRITRFILE"
 
-if [ $# -ge 2 ]; then
-    WRITE_NUM=$2
-fi
+# Call writer
+./writer "$WRITRFILE_NAME" "$WRITE_STRING"
 
-# Navigate to the script's directory (i.e., finder-app)
-cd "$(dirname "$0")"
+# Run finder
+MATCHCOUNT=$(./finder.sh "$WRITRFILE" "$WRITE_STRING" | grep -o 'Number of files are.*[0-9]' | grep -o '[0-9]*')
 
-# 🔧 ADD THIS: Clean and build writer before running it
-make clean
-make
-
-# Remove old data
-rm -rf ${WRITEDIR}
-mkdir -p ${WRITEDIR}
-
-# Write files using writer
-for i in $(seq 1 ${WRITE_NUM}); do
-    ./writer "${WRITEDIR}/file${i}.txt" "${WRITE_STR}"
-done
-
-# Find string occurrences
-MATCHCOUNT=$(./finder.sh "${WRITEDIR}" "${WRITE_STR}" | grep "Number of files" | awk '{print $6}' || echo 0)
-
+# Debug output
 echo "WRITE_NUM = $WRITE_NUM"
 echo "MATCHCOUNT = $MATCHCOUNT"
 
-if [[ "$MATCHCOUNT" =~ ^[0-9]+$ ]] && [ "$MATCHCOUNT" -eq "$WRITE_NUM" ]; then
-    echo "Success: Found $MATCHCOUNT matches"
-    exit 0
-else
+# If MATCHCOUNT is empty, it's a failure
+if [ -z "$MATCHCOUNT" ]; then
+    echo "Failure: MATCHCOUNT is empty"
+    exit 1
+fi
+
+# Compare values
+if [ "$MATCHCOUNT" -ne "$WRITE_NUM" ]; then
     echo "Failure: Expected $WRITE_NUM matches but found $MATCHCOUNT"
     exit 1
+else
+    echo "Success: Found expected number of matches ($MATCHCOUNT)"
+    exit 0
 fi
 
