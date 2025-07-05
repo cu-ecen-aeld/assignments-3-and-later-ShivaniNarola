@@ -1,15 +1,11 @@
-CC = gcc
-CFLAGS = -Wall -Werror
-TARGET = writer
+CC=gcc
+CFLAGS=-Wall -Werror
 
-ifdef CROSS_COMPILE
-CC = $(CROSS_COMPILE)gcc
-endif
+all: writer
 
-all: $(TARGET)
-
-$(TARGET): writer.c
-	$(CC) $(CFLAGS) -o $(TARGET) writer.c
+writer: writer.c
+	$(CC) $(CFLAGS) writer.c -o writer
 
 clean:
-	rm -f $(TARGET) *.o
+	rm -f writer *.o
+

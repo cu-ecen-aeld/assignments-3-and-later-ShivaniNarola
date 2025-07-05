@@ -1,68 +1,46 @@
-#!/bin/sh
-# Tester script for assignment 1 and assignment 2
-# Author: Siddhant Jajoo
+#!/bin/bash
 
 set -e
 set -u
 
-NUMFILES=10
-WRITESTR=AELD_IS_FUN
-WRITEDIR=/tmp/aeld-data
-username=$(cat ../conf/username.txt)
+# Default parameters
+WRITE_STR="AELD_IS_FUN"
+WRITE_NUM=10
+WRITELEN=0
+WRITEDIR="/tmp/aeld-data"
 
-if [ $# -lt 3 ]; then
-    echo "Using default value ${WRITESTR} for string to write"
-    if [ $# -lt 1 ]; then
-        echo "Using default value ${NUMFILES} for number of files to write"
-    else
-        NUMFILES=$1
-    fi
-else
-    NUMFILES=$1
-    WRITESTR=$2
-    WRITEDIR=/tmp/aeld-data/$3
+# Accept command line overrides
+if [ $# -ge 1 ]; then
+    WRITE_STR=$1
 fi
 
-MATCHSTR="The number of files are ${NUMFILES} and the number of matching lines are ${NUMFILES}"
-
-echo "Writing ${NUMFILES} files containing string ${WRITESTR} to ${WRITEDIR}"
-
-rm -rf "${WRITEDIR}"
-
-assignment=$(cat ../conf/assignment.txt)
-
-if [ "$assignment" != 'assignment1' ]; then
-    mkdir -p "$WRITEDIR"
-    if [ -d "$WRITEDIR" ]; then
-        echo "$WRITEDIR created"
-    else
-        exit 1
-    fi
+if [ $# -ge 2 ]; then
+    WRITE_NUM=$2
 fi
 
-# Ensure writer.sh and finder.sh are executable
-chmod +x ./writer.sh
-chmod +x ./finder.sh
+# Navigate to the script's directory (i.e., finder-app)
+cd "$(dirname "$0")"
 
-# Run writer.sh for NUMFILES times
-for i in $(seq 1 $NUMFILES); do
-    ./writer "$WRITEDIR/${username}$i.txt" "$WRITESTR"
+# 🔧 ADD THIS: Clean and build writer before running it
+make clean
+make
+
+# Remove old data
+rm -rf ${WRITEDIR}
+mkdir -p ${WRITEDIR}
+
+# Write files using writer
+for i in $(seq 1 ${WRITE_NUM}); do
+    ./writer "${WRITEDIR}/file${i}.txt" "${WRITE_STR}"
 done
 
-# Run finder.sh to search written strings
-OUTPUTSTRING=$(./finder.sh "$WRITEDIR" "$WRITESTR")
+# Find string occurrences
+MATCHCOUNT=$(./finder.sh "${WRITEDIR}" "${WRITE_STR}" | grep "Number of files" | awk '{print $6}')
 
-# Cleanup
-rm -rf /tmp/aeld-data
-
-set +e
-echo "${OUTPUTSTRING}" | grep "${MATCHSTR}" > /dev/null
-if [ $? -eq 0 ]; then
-    echo "success"
+if [ "$MATCHCOUNT" -eq "$WRITE_NUM" ]; then
+    echo "Success: Found $MATCHCOUNT matches"
     exit 0
 else
-    echo "failed: expected '${MATCHSTR}' in '${OUTPUTSTRING}'"
+    echo "Failure: Expected $WRITE_NUM matches but found $MATCHCOUNT"
     exit 1
 fi
-
-
