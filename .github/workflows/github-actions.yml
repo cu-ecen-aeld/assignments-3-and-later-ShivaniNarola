@@ -13,33 +13,18 @@ jobs:
     container: cuaesd/aesd-autotest:24-unit-test
     steps:
       - uses: actions/checkout@v2
-
       - name: Checkout submodules
         run: git submodule update --init --recursive
-
       - name: Run unit-test.sh
         run: ./unit-test.sh
 
   full-test:
     runs-on: ubuntu-latest
-    container: cuaesd/aesd-autotest:24-assignment1
+    container: cuaesd/aesd-autotest:24-assignment2
     steps:
       - uses: actions/checkout@v2
-
       - name: Checkout submodules
         run: git submodule update --init --recursive
-
-      - name: Prepare test input for finder.sh
-        run: |
-          mkdir -p /tmp/sampledir
-          echo "assignment1 content 1" > /tmp/sampledir/file1.txt
-          echo "assignment1 content 2" > /tmp/sampledir/file2.txt
-
-      - name: Run finder.sh
-        run: ./finder-app/finder.sh /tmp/sampledir assignment1
-
-      - name: Run writer.sh
-        run: ./finder-app/writer.sh /tmp/testfile.txt "This is a test content."
-
       - name: Run full-test.sh
         run: ./full-test.sh
+
