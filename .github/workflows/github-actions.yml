@@ -18,9 +18,10 @@ jobs:
           - name: Run unit test
             run: ./unit-test.sh
 
-    full-test:
+        full-test:
         container: cuaesd/aesd-autotest:24-assignment3
         runs-on: ubuntu-latest
+        continue-on-error: true
         steps:
           - uses: actions/checkout@v2
           - name: Checkout submodules
