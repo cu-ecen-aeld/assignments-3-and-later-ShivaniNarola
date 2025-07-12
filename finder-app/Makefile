@@ -1,11 +1,12 @@
-CC=gcc
-CFLAGS=-Wall -Werror
+# CROSS_COMPILE=aarch64-none-linux-gnu-
+CC = $(CROSS_COMPILE)gcc
+CFFLAGS = -g -Wall -Werror
 
 all: writer
 
 writer: writer.c
-	$(CC) $(CFLAGS) writer.c -o writer
+	$(CC) $(CFFLAGS) -o writer writer.c
 
 clean:
-	rm -f writer *.o
+	rm -f *.o writer
 
